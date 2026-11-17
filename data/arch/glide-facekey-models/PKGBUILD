@@ -1,0 +1,27 @@
+pkgname=glide-facekey-models
+pkgver=1.r0.g0000000
+pkgrel=1
+pkgdesc="Recognition models and ONNX Runtime 1.20.1 for Glide FaceKey"
+arch=(x86_64)
+url="https://github.com/Glide-Desktop/glide-facekey-models"
+license=(custom)
+depends=(glibc gcc-libs)
+makedepends=(git)
+options=(!strip !debug)
+_git="${GLIDE_GIT:-https://github.com/Glide-Desktop}"
+source=("$pkgname::git+$_git/glide-facekey-models.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "$pkgname"
+    printf '1.r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+package() {
+    cd "$pkgname"
+    for model in models/*.onnx; do
+        install -Dm644 "$model" "$pkgdir/usr/share/glide/face/${model#models/}"
+    done
+    install -Dm755 lib/libonnxruntime.so.1.20.1 "$pkgdir/usr/lib/glide/face/libonnxruntime.so"
+    install -Dm644 README.md "$pkgdir/usr/share/licenses/$pkgname/README.md"
+}
