@@ -1,5 +1,5 @@
 pkgname=glide-facekey-models
-pkgver=1.r0.g0000000
+pkgver=1.r1.g463cc2c
 pkgrel=1
 pkgdesc="Recognition models and ONNX Runtime 1.20.1 for Glide FaceKey"
 arch=(x86_64)
@@ -9,12 +9,16 @@ depends=(glibc gcc-libs)
 makedepends=(git)
 options=(!strip !debug)
 _git="${GLIDE_GIT:-https://github.com/Glide-Desktop}"
-source=("$pkgname::git+$_git/glide-facekey-models.git")
+source=("$pkgname::git+$_git/glide-facekey-models")
 sha256sums=('SKIP')
 
 pkgver() {
     cd "$pkgname"
-    printf '1.r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+    if tag="$(git describe --long --tags --abbrev=7 2>/dev/null)"; then
+        printf '%s' "$tag" | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+    else
+        printf '0.r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+    fi
 }
 
 package() {
